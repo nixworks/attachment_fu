@@ -6,6 +6,12 @@ class Attachment < ActiveRecord::Base
   after_attachment_saved do |record|
     self.saves += 1
   end
+  
+  def initialize(*args)
+    puts "initialize #{args.inspect}"
+    super
+    puts self.filename
+  end
 end
 
 class SmallAttachment < Attachment
