@@ -339,9 +339,11 @@ module Technoweenie # :nodoc:
         if file_data.respond_to?(:content_type)
           return nil if file_data.size == 0
           self.content_type = file_data.content_type
+          @original_filename = file_data.original_filename if respond_to?(:filename)
         else
           return nil if file_data.blank? || file_data['size'] == 0
           self.content_type = file_data['content_type']
+          @original_filename = file_data['filename']
           file_data = file_data['tempfile']
         end
         if file_data.is_a?(StringIO)
@@ -425,7 +427,12 @@ module Technoweenie # :nodoc:
         
         # before_validation callback
         def set_filename
-          self.filename ||= String.random
+          self.filename ||= begin
+            extension = (type = MIME::Types[self.content_type].first) ? ".#{type.extensions.first}" : File.extname(@original_filename) if @original_filename
+            extension ||= File.extname(@original_filename) if @original_filename
+            
+            "#{String.random}#{extension}"
+          end
         end
 
         # validates the size and content_type attributes according to the current model's options
