@@ -180,6 +180,7 @@ module Technoweenie # :nodoc:
         base.class_inheritable_accessor :attachment_options
         base.before_destroy :destroy_thumbnails
         base.before_validation :set_size_from_temp_path
+        base.before_validation :set_filename
         base.after_save :after_process_attachment
         base.after_destroy :destroy_file
         base.after_validation :process_attachment
@@ -338,11 +339,9 @@ module Technoweenie # :nodoc:
         if file_data.respond_to?(:content_type)
           return nil if file_data.size == 0
           self.content_type = file_data.content_type
-          self.filename     = file_data.original_filename if respond_to?(:filename)
         else
           return nil if file_data.blank? || file_data['size'] == 0
           self.content_type = file_data['content_type']
-          self.filename =  file_data['filename']
           file_data = file_data['tempfile']
         end
         if file_data.is_a?(StringIO)
@@ -422,6 +421,11 @@ module Technoweenie # :nodoc:
         # before_validation callback.
         def set_size_from_temp_path
           self.size = File.size(temp_path) if save_attachment?
+        end
+        
+        # before_validation callback
+        def set_filename
+          self.filename ||= String.random
         end
 
         # validates the size and content_type attributes according to the current model's options
