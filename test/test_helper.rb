@@ -81,7 +81,9 @@ class Test::Unit::TestCase #:nodoc:
   protected
     def upload_file(options = {})
       use_temp_file options[:filename] do |file|
-        att = attachment_model.create :uploaded_data => fixture_file_upload(file, options[:content_type] || 'image/png')
+        att = attachment_model.new :uploaded_data => fixture_file_upload(file, options[:content_type] || 'image/png')
+        att.filename = options[:filename]
+        att.save
         att.reload unless att.new_record?
         return att
       end

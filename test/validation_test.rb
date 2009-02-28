@@ -42,14 +42,4 @@ class ValidationTest < Test::Unit::TestCase
     assert !@attachment.valid?
     assert_nil @attachment.errors.on(:content_type)
   end
-
-  def test_should_require_filename
-    @attachment = Attachment.new
-    assert !@attachment.valid?
-    assert @attachment.errors.on(:filename)
-    
-    @attachment.filename = 'foo'
-    assert !@attachment.valid?
-    assert_nil @attachment.errors.on(:filename)
-  end
 end
